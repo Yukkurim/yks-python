@@ -1,0 +1,41 @@
+name: Notify Discord
+
+on:
+  push:
+    branches:
+      - main  # または your branch name
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Webhook
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          PAYLOAD=$(cat <<EOF
+          {
+            "embeds": [
+              {
+                "title": "新しいPushがありました",
+                "description": "**[${{ github.repository }}](${{ github.server_url }}/${{ github.repository }})** に push されました。",
+                "fields": [
+                  {
+                    "name": "コミット者",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "ブランチ",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  }
+                ],
+                "color": 5814783,
+                "timestamp": "${{ github.event.head_commit.timestamp }}"
+              }
+            ]
+          }
+EOF
+          )
+          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL"
