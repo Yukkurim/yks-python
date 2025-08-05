@@ -1,2 +1,2 @@
-# yks-python
-YKS Player for Python 
+# YKS Player for Client
+YKS Player for Client
