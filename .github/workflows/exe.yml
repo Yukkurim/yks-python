@@ -1,3 +1,5 @@
+name: Build and Sign with Trusted Signing
+
 permissions:
   id-token: write
   contents: read
@@ -5,14 +7,18 @@ permissions:
 on:
   push:
     branches: [main]
+  workflow_dispatch:   # これを追加すると手動で実行可能
 
 jobs:
   build-and-sign:
     runs-on: windows-latest
     name: Build app and sign files with Trusted Signing
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true   # Git LFS ファイルも取得
 
       - name: Azure login
         uses: azure/login@v2
@@ -32,18 +38,11 @@ jobs:
           file-digest: SHA256
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
           timestamp-digest: SHA256
-          exclude-environment-credential: true
-          exclude-workload-identity-credential: true
-          exclude-managed-identity-credential: true
-          exclude-shared-token-cache-credential: true
-          exclude-visual-studio-credential: true
-          exclude-visual-studio-code-credential: true
           exclude-azure-cli-credential: false
-          exclude-azure-powershell-credential: true
-          exclude-azure-developer-cli-credential: true
-          exclude-interactive-browser-credential: true
-      - name: upload
+          exclude-other-credentials: true
+
+      - name: Upload signed files
         uses: actions/upload-artifact@v4
         with:
-          name: upload
+          name: signed-files
           path: dist
