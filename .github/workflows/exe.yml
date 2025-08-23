@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # これを追加すると手動で実行可能
+  workflow_dispatch:
 
 jobs:
   build-and-sign:
@@ -15,10 +15,10 @@ jobs:
     name: Build app and sign files with Trusted Signing
     steps:
 
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          lfs: true   # Git LFS ファイルも取得
+          lfs: true
 
       - name: Azure login
         uses: azure/login@v2
@@ -39,7 +39,15 @@ jobs:
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
           timestamp-digest: SHA256
           exclude-azure-cli-credential: false
-          exclude-other-credentials: true
+          exclude-environment-credential: true
+          exclude-workload-identity-credential: true
+          exclude-managed-identity-credential: true
+          exclude-shared-token-cache-credential: true
+          exclude-visual-studio-credential: true
+          exclude-visual-studio-code-credential: true
+          exclude-azure-powershell-credential: true
+          exclude-azure-developer-cli-credential: true
+          exclude-interactive-browser-credential: true
 
       - name: Upload signed files
         uses: actions/upload-artifact@v4
